@@ -1,6 +1,5 @@
 package kmi0817.naara.webclient.dto;
 
-import kmi0817.naara.hospital.domain.Hospital;
 import lombok.Getter;
 
 import java.util.List;
@@ -22,7 +21,7 @@ public class ApiResponse {
 
             @Getter
             public static class Items {
-                private List<Hospital> item;
+                private List<Item> item;
             }
         }
     }

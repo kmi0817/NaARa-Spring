@@ -2,7 +2,9 @@ package kmi0817.naara.webclient;
 
 import kmi0817.naara.hospital.domain.Hospital;
 import kmi0817.naara.webclient.dto.ApiResponse;
+import kmi0817.naara.webclient.dto.Item;
 import lombok.extern.slf4j.Slf4j;
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
@@ -32,6 +34,7 @@ public class WebClientService {
     }
 
     public List<Hospital> callHospitalApi() {
+        log.info("WebClientService > callHospitalApi");
         try {
             ApiResponse result = webClient.mutate()
                     .build()
@@ -47,14 +50,26 @@ public class WebClientService {
                     .bodyToMono(ApiResponse.class)
                     .block();
 
-            log.info("result = {}", Objects.requireNonNull(result).getResponse().getBody().getItems().getItem());
-            return result.getResponse().getBody().getItems().getItem();
+            log.info("items = {}", Objects.requireNonNull(result).getResponse().getBody().getItems().getItem());
+            List<Item> items = result.getResponse().getBody().getItems().getItem();
+            return convertItemToHospital(items);
         } catch (Exception e) {
             //TODO Fix Error Handling
 
             log.error(e.getMessage());
             return new ArrayList<>();
         }
+    }
+
+    private List<Hospital> convertItemToHospital(List<Item> items) {
+        List<Hospital> hospitals = new ArrayList<>();
+        ModelMapper modelMapper = new ModelMapper();
+
+        for (Item item: items) {
+            hospitals.add(modelMapper.map(item, Hospital.class));
+        }
+
+        return hospitals;
     }
 
 }
